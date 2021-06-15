@@ -122,14 +122,14 @@ class DataManagerPlugin extends Plugin
         switch ($extension) {
             case '.txt':
             case '.yaml':
-                $file = CompiledYamlFile::instance(DATA_DIR . $type . '/' . $filename);
+                $file = CompiledYamlFile::instance(Utils::fullPath('user-data://') . '/' . $type . '/' . $filename);
                 break;
             case '.json':
-                $file = JsonFile::instance(DATA_DIR . $type . '/' . $filename);
+                $file = JsonFile::instance(Utils::fullPath('user-data://') . '/' . $type . '/' . $filename);
                 break;
             case '.html':
             default:
-                $file = File::instance(DATA_DIR . $type . '/' . $filename);
+                $file = File::instance(Utils::fullPath('user-data://') . '/' . $type . '/' . $filename);
         }
 
         if (!$file->exists()) {
@@ -152,7 +152,7 @@ class DataManagerPlugin extends Plugin
         $extension = $this->config->get("plugins.data-manager.types.{$type}.file_extension");
 
         $items = [];
-        $fileIterator = new \FilesystemIterator(DATA_DIR . $type, \FilesystemIterator::SKIP_DOTS);
+        $fileIterator = new \FilesystemIterator(Utils::fullPath('user-data://') . '/' . $type, \FilesystemIterator::SKIP_DOTS);
         /** @var \FilesystemIterator $entry */
         foreach ($fileIterator as $entry) {
             $file = $entry->getFilename();
@@ -183,18 +183,18 @@ class DataManagerPlugin extends Plugin
         //Find data types excluded by plugins
         $this->grav->fireEvent('onDataTypeExcludeFromDataManagerPluginHook');
 
-        $typesIterator = new \FilesystemIterator(DATA_DIR, \FilesystemIterator::SKIP_DOTS);
+        $typesIterator = new \FilesystemIterator(Utils::fullPath('user-data://') . '/', \FilesystemIterator::SKIP_DOTS);
         foreach ($typesIterator as $type) {
             $typeName = $type->getFilename();
             if ($typeName[0] === '.') {
                 continue;
             }
 
-            if (!is_dir(DATA_DIR . $typeName)) {
+            if (!is_dir(Utils::fullPath('user-data://') . '/' . $typeName)) {
                 continue;
             }
 
-            $iterator = new \FilesystemIterator(DATA_DIR . $typeName, \FilesystemIterator::SKIP_DOTS);
+            $iterator = new \FilesystemIterator(Utils::fullPath('user-data://') . '/' . $typeName, \FilesystemIterator::SKIP_DOTS);
             $count = 0;
             foreach ($iterator as $fileinfo) {
                 if ($fileinfo->getFilename()[0] === '.') {
